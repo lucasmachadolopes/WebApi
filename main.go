@@ -1,13 +1,21 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
+	router := gin.Default()
+
+	// Query string parameters are parsed using the existing underlying request object.
+	// The request responds to a url matching:  /welcome?firstname=Jane&lastname=Doe
+	router.GET("/welcome", func(c *gin.Context) {
+		firstname := c.DefaultQuery("firstname", "Guest")
+		lastname := c.Query("lastname") // shortcut for c.Request.URL.Query().Get("lastname")
+
+		c.String(http.StatusOK, "Hello %s %s", firstname, lastname)
 	})
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	router.Run(":8080")
 }
